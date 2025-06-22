@@ -1,0 +1,24 @@
+{
+    "name": "tutorial_InSolution",
+    "RLT_type": "simplified",
+    "RLT_path": "/usr/src/RLT_files",
+    "model": "InSolution",
+    "geometrical_parameters": {
+        "receptor": [20, 140, 5, 20],
+        "ligand1": [20, 140, 5, 20]
+    },
+    "simulation_settings": {
+        "binder_concentration": [0.03, 0.01, 0.003, 0.001, 0.0003, 0.0001, 3e-05, 1e-05, 3e-06, 1e-06, 3e-07, 1e-07, 3e-08, 1e-08, 3e-09, 1e-09, 3e-10, 1e-10, 3e-11],
+        "target_concentration": [1e-11],
+        "output": ["final_response", "response"],
+        "association_time": 1800,
+        "dissociation_time": 100,
+        "saveat": 1,
+        "relative_tolerance": 1e-06,
+        "absolute_tolerance": 1e-15,
+        "parallel": true
+    },
+    "kinetic_config": {
+        "ligand1": [[300000.0, 30.0, 300000.0, 30.0], [300000.0, 30.0, 300000.0, 30.0]]
+    }
+}
