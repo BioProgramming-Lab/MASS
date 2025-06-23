@@ -69,9 +69,6 @@ def ConfigFileCheck(config_data):
         if (not "dissociation_time" in config_data["simulation_settings"].keys()):
             print ("invalid config file! Missing term \"simulation_settings\"/\"dissociation_time\"\n")
             exit()
-        if (config_data["model"] == "InSolution" and len(config_data["simulation_settings"]["target_concentration"]) != 1):
-            print ("invalid config file! For InSolution model, there should be only one target concentration\n")
-            exit()
         
 
 def ConfigFileDigestion():
@@ -82,6 +79,21 @@ def ConfigFileDigestion():
 
     if (config_data["model"] == "OnSurface"):
         config_data["RLT_type"] = "full"  # OnSurface model only supports full RLT type
+        config_data["geometrical_parameters"]["receptor"] = config_data["geometrical_parameters"]["binder"]  # receptor is the binder in OnSurface model
+        topology_i = 1
+        while f"antigen{topology_i}" in config_data["geometrical_parameters"].keys():
+            config_data["geometrical_parameters"][f"ligand{topology_i}"] = config_data["geometrical_parameters"][f"antigen{topology_i}"]
+            config_data["kinetic_config"][f"ligand{topology_i}"] = config_data["kinetic_config"][f"antigen{topology_i}"]  # OnSurface model uses antigen{topology_i} as ligand{topology_i}
+            topology_i = topology_i + 1
+        config_data["simulation_settings"]["target_concentration"] = config_data["simulation_settings"]["antigen_concentration"]  # target_concentration is the antigen_concentration in OnSurface model
+        config_data["simulation_settings"]["target_density"] = config_data["simulation_settings"]["antigen_density"]  # target_density is the antigen_density in OnSurface model
+    if (config_data["model"] == "InSolution"):
+        config_data["geometrical_parameters"]["receptor"] = config_data["geometrical_parameters"]["target"]  # receptor is the target in InSolution model
+        topology_i = 1
+        while f"binder{topology_i}" in config_data["geometrical_parameters"].keys():
+            config_data["geometrical_parameters"][f"ligand{topology_i}"] = config_data["geometrical_parameters"][f"binder{topology_i}"] # InSolution model uses binder{topology_i} as ligand{topology_i}
+            config_data["kinetic_config"][f"ligand{topology_i}"] = config_data["kinetic_config"][f"binder{topology_i}"]  # InSolution model uses binder{topology_i} as ligand{topology_i}
+            topology_i = topology_i + 1
 
     # check if the config file is valid
     ConfigFileCheck(config_data)
@@ -139,8 +151,12 @@ def ConfigFileDigestion():
 
     # write in titration_conc.tc and conc.conc
     titration_conc_file = open(Args.Directory + "titration_conc.tc", 'w')
-    for i in config_data["simulation_settings"]["binder_concentration"]:
-        titration_conc_file.write(f"{i} ")
+    if (config_data["model"] == "OnSurface"):
+        for i in config_data["simulation_settings"]["binder_concentration"]:
+            titration_conc_file.write(f"{i} ")
+    if (config_data["model"] == "InSolution"):
+        for i in config_data["simulation_settings"]["target_concentration"]:
+            titration_conc_file.write(f"{i} ")
     titration_conc_file.close()
 
     conc_file = open(Args.Directory + "conc.conc", 'w')
