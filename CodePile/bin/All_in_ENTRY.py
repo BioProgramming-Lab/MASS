@@ -87,6 +87,7 @@ def ConfigFileDigestion():
             topology_i = topology_i + 1
         config_data["simulation_settings"]["target_concentration"] = config_data["simulation_settings"]["antigen_concentration"]  # target_concentration is the antigen_concentration in OnSurface model
         config_data["simulation_settings"]["target_density"] = config_data["simulation_settings"]["antigen_density"]  # target_density is the antigen_density in OnSurface model
+        config_data["simulation_settings"]["titrating_iteration"] = len(config_data["simulation_settings"]["binder_concentration"])  # titrating_iteration is the length of binder_concentration in OnSurface model
     if (config_data["model"] == "InSolution"):
         config_data["geometrical_parameters"]["receptor"] = config_data["geometrical_parameters"]["target"]  # receptor is the target in InSolution model
         topology_i = 1
@@ -94,6 +95,7 @@ def ConfigFileDigestion():
             config_data["geometrical_parameters"][f"ligand{topology_i}"] = config_data["geometrical_parameters"][f"binder{topology_i}"] # InSolution model uses binder{topology_i} as ligand{topology_i}
             config_data["kinetic_config"][f"ligand{topology_i}"] = config_data["kinetic_config"][f"binder{topology_i}"]  # InSolution model uses binder{topology_i} as ligand{topology_i}
             topology_i = topology_i + 1
+        config_data["simulation_settings"]["titrating_iteration"] = len(config_data["simulation_settings"]["target_concentration"])  # titrating_iteration is the length of target_concentration in InSolution model
 
     # check if the config file is valid
     ConfigFileCheck(config_data)
@@ -241,8 +243,8 @@ def simulate():
 
     if Config['simulation_settings']['parallel']:
         CURLY_BRACE = "{}"
-        os.system(f"seq {len(Config['simulation_settings']['binder_concentration'])} | parallel python {Sim_path} -R {Config['RLT_path']}{Config['RLT_type']}/ -d {Args.Directory[0:-1]} -t {Config['topology']} -l {Config['simulation_settings']['saveat']} -o {output_type} -m {Config['model']} --rtol {Config['simulation_settings']['relative_tolerance']} --atol {Config['simulation_settings']['absolute_tolerance']} --association_time {Config['simulation_settings']['association_time']} --dissociation_time {Config['simulation_settings']['dissociation_time']} -j {CURLY_BRACE} --use-previous-sim")
-        os.system(f"python {Merge_path} -d {Args.Directory} -n {len(Config['simulation_settings']['binder_concentration'])}")
+        os.system(f"seq {Config["simulation_settings"]["titrating_iteration"]} | parallel python {Sim_path} -R {Config['RLT_path']}{Config['RLT_type']}/ -d {Args.Directory[0:-1]} -t {Config['topology']} -l {Config['simulation_settings']['saveat']} -o {output_type} -m {Config['model']} --rtol {Config['simulation_settings']['relative_tolerance']} --atol {Config['simulation_settings']['absolute_tolerance']} --association_time {Config['simulation_settings']['association_time']} --dissociation_time {Config['simulation_settings']['dissociation_time']} -j {CURLY_BRACE} --use-previous-sim")
+        os.system(f"python {Merge_path} -d {Args.Directory} -n {Config["simulation_settings"]["titrating_iteration"]}")
     else:
         os.system(f"python {Sim_path} -R {Config['RLT_path']}{Config['RLT_type']}/ -d {Args.Directory[0:-1]} -t {Config['topology']} -l {Config['simulation_settings']['saveat']} -o {output_type} -m {Config['model']} --rtol {Config['simulation_settings']['relative_tolerance']} --atol {Config['simulation_settings']['absolute_tolerance']} --association_time {Config['simulation_settings']['association_time']} --dissociation_time {Config['simulation_settings']['dissociation_time']}")
     
