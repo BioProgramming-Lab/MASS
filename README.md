@@ -2,7 +2,7 @@
 # MASS: Multivalent Antigen Sensing Simulator
 
 Multivalent Antigen Sensing Simulator (**MASS**) is a Dockerized simulation toolkit designed for modeling multivalent interactions. It facilitates flexible and customizable design of multivalent protein binders.
-More details con be found in our reasearch paper associated with MASS at: LINK_TO_OUR_PAPER
+More details can be found in our reasearch paper associated with MASS at: LINK_TO_OUR_PAPER
 
 ## 🚀 Installation
 
