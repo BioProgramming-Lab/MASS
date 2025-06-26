@@ -37,6 +37,26 @@ This will display help information and available options.
 MASS -d RELATIVE_PATH_TO_WORKING_DIR
 ```
 
+### Output Format
+
+If the simulation ends succesfully, MASS will generate `titration_result.json` as an output file under your working directory.
+This output file has a following structure:
+```
+{
+   "$titrant_concentration_1": {
+      "Time": [list of saved time points],
+      "Output": {
+         "$Chosen_output_1": [...],
+         ...
+         "$Chosen_output_m": [...]
+      }
+   },
+   ...
+   "$titrant_concentration_n": {...}
+}
+```
+Users may develop their own code for advanced analysis and plotting.
+
 ### Example Simulations
 
 Example configuration files for both *in-solution* and *on-surface* modes are available in `/usr/src/tutorial`. To run them:
